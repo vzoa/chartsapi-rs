@@ -5,9 +5,10 @@ use crate::response_dtos::ResponseDto::{Charts, GroupedCharts};
 use crate::response_dtos::{ChartDto, ChartGroup, GroupedChartsDto, ResponseDto};
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
+use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
-use axum::{Json, Router};
+use axum::{extract::Request, Json, Router};
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use indexmap::IndexMap;
 
@@ -17,7 +18,7 @@ use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 mod faa_metafile;
 #[cfg(feature = "mcp")]
 mod mcp;
@@ -87,6 +88,7 @@ async fn main() {
         )
         .route("/health", get(|| async {}))
         .with_state(axum_state)
+        .layer(middleware::from_fn(log_error_responses))
         .layer(TraceLayer::new_for_http());
 
     #[cfg(feature = "mcp")]
@@ -102,6 +104,29 @@ async fn main() {
         let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
         axum::serve(listener, base_app).await.unwrap();
     }
+}
+
+async fn log_error_responses(request: Request, next: Next) -> Response {
+    let method = request.method().clone();
+    let uri = request.uri().clone();
+    let response = next.run(request).await;
+    let status = response.status();
+    if status.is_client_error() {
+        warn!(
+            %method,
+            %uri,
+            status = status.as_u16(),
+            "Client error response"
+        );
+    } else if status.is_server_error() {
+        error!(
+            %method,
+            %uri,
+            status = status.as_u16(),
+            "Server error response"
+        );
+    }
+    response
 }
 
 #[derive(Deserialize)]
