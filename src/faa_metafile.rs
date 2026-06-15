@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct DigitalTpp {
-    #[serde(rename = "@cycle")]
+    #[serde(rename = "@Cycle")]
     pub cycle: String,
     #[serde(rename = "@from_edate")]
     pub from_effective_date: String,
