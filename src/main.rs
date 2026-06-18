@@ -399,7 +399,7 @@ async fn load_charts(current_cycle: &str) -> Result<ChartsHashMaps, anyhow::Erro
                         chart_group: match record.chart_code.as_str() {
                             "IAP" => ChartGroup::Approaches,
                             "ODP" | "DP" | "DAU" => ChartGroup::Departures,
-                            "STAR" => ChartGroup::Arrivals,
+                            "STAR" | "STR" => ChartGroup::Arrivals,
                             "APD" => ChartGroup::Apd,
                             _ => ChartGroup::General, // Includes "MIN" | "LAH" | "HOT"
                         },
