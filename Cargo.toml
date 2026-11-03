@@ -19,9 +19,9 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing = "0.1.41"
 tower-http = { version = "0.6.2", features = ["trace", "fs"] }
 chrono = "0.4.40"
-rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk/", features = [
+rmcp = { version = "3.8.0", optional = true, features = [
     "server",
-    "transport-sse-server",
-    "transport-io",
-], optional = true }
+    "macros",
+    "transport-streamable-http-server",
+] }
 tokio-util = { version = "0.7.14", optional = true }
