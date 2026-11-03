@@ -18,4 +18,8 @@ This version includes the following features that are a superset to the Aviation
 
 # MCP Support
 
+- Streamable HTTP endpoint: `/mcp`
 - `get_charts` maps to `/charts/{airport id}`
+- Host header allowlist defaults to loopback (`localhost`, `127.0.0.1`, `::1`).
+  For non-local clients, set `MCP_ALLOWED_HOSTS` to a comma-separated list of
+  hostnames or `host:port` authorities (DNS rebinding protection).
